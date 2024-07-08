@@ -10,11 +10,11 @@ void fromEigen2Vector(const Eigen::VectorXd& eigen, std::vector<double> vector)
   Eigen::VectorXd::Map(&vector[0], eigen.rows()) = eigen;
 }
 
-moveit::core::RobotState fromWaypoint2State(const Eigen::VectorXd& waypoint,
-                                            const moveit::core::RobotStateConstPtr& robot_state,
-                                            const std::string& group_name)
+moveit::core::RobotStatePtr fromWaypoint2State(const Eigen::VectorXd& waypoint,
+                                               const moveit::core::RobotStateConstPtr& robot_state,
+                                               const std::string& group_name)
 {
-  moveit::core::RobotStatePtr state = std::make_shared<moveit::core::RobotState>(robot_state);
+  moveit::core::RobotStatePtr state = std::make_shared<moveit::core::RobotState>(*robot_state);
   state->setJointGroupPositions(group_name,waypoint);
   state->update();
 
@@ -24,7 +24,7 @@ moveit::core::RobotState fromWaypoint2State(const Eigen::VectorXd& waypoint,
 bool fromWaypoints2States(const std::vector<Eigen::VectorXd>& waypoints,
                           const moveit::core::RobotStateConstPtr& robot_state,
                           const std::string& group_name,
-                          std::vector<moveit::core::RobotState>& states)
+                          std::vector<moveit::core::RobotStatePtr>& states)
 {
   states.clear();
   states.reserve(waypoints.size());
@@ -40,17 +40,17 @@ bool fromWaypoints2States(const std::vector<Eigen::VectorXd>& waypoints,
 
 bool MoveitTrajectoryProcessor::computeTrj()
 {
-  RobotState initial_state;
+  RobotStatePtr initial_state;
   return computeTrj(initial_state);
 }
 
-bool MoveitTrajectoryProcessor::computeTrj(const RobotState& initial_state)
+bool MoveitTrajectoryProcessor::computeTrj(const RobotStatePtr& initial_state)
 {
-  RobotState final_state;
+  RobotStatePtr final_state;
   return computeTrj(initial_state,final_state);
 }
 
-bool MoveitTrajectoryProcessor::computeTrj(const RobotState& initial_state, const RobotState& final_state)
+bool MoveitTrajectoryProcessor::computeTrj(const RobotStatePtr& initial_state, const RobotStatePtr& final_state)
 {
   if(path_.empty())
   {
@@ -66,7 +66,7 @@ bool MoveitTrajectoryProcessor::computeTrj(const RobotState& initial_state, cons
 
   robot_state::RobotStatePtr robot_state = std::make_shared<robot_state::RobotState>(robot_model_);
 
-  std::vector<moveit::core::RobotState> states_vector;
+  std::vector<moveit::core::RobotStatePtr> states_vector;
   if(not fromWaypoints2States(path_,robot_state,group_name_,states_vector))
     return false;
 
@@ -74,17 +74,17 @@ bool MoveitTrajectoryProcessor::computeTrj(const RobotState& initial_state, cons
 
   for(unsigned int j=0; j<path_.size();j++)
   {
-    if(j==0 && (not initial_state.pos_.empty()))
+    if(j==0 && (initial_state != nullptr))
     {
-      states_vector.at(j).setJointGroupPositions    (group_name_,initial_state.pos_);
-      states_vector.at(j).setJointGroupVelocities   (group_name_,initial_state.vel_);
-      states_vector.at(j).setJointGroupAccelerations(group_name_,initial_state.acc_);
+      states_vector.at(j)->setJointGroupPositions    (group_name_,initial_state->pos_);
+      states_vector.at(j)->setJointGroupVelocities   (group_name_,initial_state->vel_);
+      states_vector.at(j)->setJointGroupAccelerations(group_name_,initial_state->acc_);
     }
-    else if(j==(path_.size()-1) && (not final_state.pos_.empty()))
+    else if(j==(path_.size()-1) && (final_state != nullptr))
     {
-      states_vector.at(j).setJointGroupPositions    (group_name_,final_state.pos_);
-      states_vector.at(j).setJointGroupVelocities   (group_name_,final_state.vel_);
-      states_vector.at(j).setJointGroupAccelerations(group_name_,final_state.acc_);
+      states_vector.at(j)->setJointGroupPositions    (group_name_,final_state->pos_);
+      states_vector.at(j)->setJointGroupVelocities   (group_name_,final_state->vel_);
+      states_vector.at(j)->setJointGroupAccelerations(group_name_,final_state->acc_);
     }
     trj->addSuffixWayPoint(states_vector.at(j),0.001);
   }
@@ -100,18 +100,19 @@ bool MoveitTrajectoryProcessor::computeTrj(const RobotState& initial_state, cons
 
   tp->computeTimeStamps(*trj);
 
-  TrjPoint pt;
   moveit_msgs::RobotTrajectory trj_msg;
   trj->getRobotTrajectoryMsg(trj_msg);
 
   trj_.clear();
   for(const auto& trj_point:trj_msg.joint_trajectory.points)
   {
-    pt.state_.pos_ = std::move(trj_point.positions);
-    pt.state_.vel_ = std::move(trj_point.velocities);
-    pt.state_.acc_ = std::move(trj_point.accelerations);
-    pt.state_.eff_ = std::move(trj_point.effort);
-    pt.time_from_start_ = std::move(trj_point.time_from_start);
+    TrjPointPtr pt = std::make_shared<TrjPoint>();
+
+    pt->state_->pos_ = std::move(trj_point.positions);
+    pt->state_->vel_ = std::move(trj_point.velocities);
+    pt->state_->acc_ = std::move(trj_point.accelerations);
+    pt->state_->eff_ = std::move(trj_point.effort);
+    pt->time_from_start_ = std::move(trj_point.time_from_start.toSec());
 
     trj_.push_back(pt);
   }
@@ -119,7 +120,7 @@ bool MoveitTrajectoryProcessor::computeTrj(const RobotState& initial_state, cons
   return true;
 }
 
-bool MoveitTrajectoryProcessor::init(const KinodynamicConstraints& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::string &group_name, const moveit::core::RobotModelPtr &robot_model)
+bool MoveitTrajectoryProcessor::init(const KinodynamicConstraintsPtr& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::string &group_name, const moveit::core::RobotModelPtr &robot_model)
 {
   SplineTrajectoryProcessor::init(constraints,param_ns,logger);
 
@@ -160,7 +161,7 @@ bool MoveitTrajectoryProcessor::init(const KinodynamicConstraints& constraints, 
 
   return true;
 }
-bool MoveitTrajectoryProcessor::init(const KinodynamicConstraints& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::vector<Eigen::VectorXd>& path, const std::string &group_name, const moveit::core::RobotModelPtr &robot_model)
+bool MoveitTrajectoryProcessor::init(const KinodynamicConstraintsPtr& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::vector<Eigen::VectorXd>& path, const std::string &group_name, const moveit::core::RobotModelPtr &robot_model)
 {
   SplineTrajectoryProcessor::init(constraints,param_ns,logger,path);
 

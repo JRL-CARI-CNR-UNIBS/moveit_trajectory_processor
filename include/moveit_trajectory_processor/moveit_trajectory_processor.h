@@ -9,6 +9,7 @@
 /**
  * @file MoveitTrajectoryProcessor.h
  * @brief Contains the declaration of the MoveitTrajectoryProcessor class.
+ * Note that this class does not consider the KinoDynamicConstraints given as input but uses the ones provided by Moveit.
  */
 
 namespace trajectories_processors
@@ -22,7 +23,7 @@ typedef std::shared_ptr<MoveitTrajectoryProcessor> MoveitTrajectoryProcessorPtr;
 
 class MoveitTrajectoryProcessor: public SplineTrajectoryProcessor
 {
-protected:
+public:
   /**
    * @brief Enum for selecting the moveit algorithm for trajectory planning.
    *        - ITP: iterative time parametrization
@@ -31,6 +32,7 @@ protected:
    */
   enum class moveit_alg_t {ITP, ISP, TOTG};
 
+protected:
   /**
    * @brief The selected moveit algorithm, default: ISP.
    */
@@ -52,13 +54,13 @@ public:
   /**
    * @brief Constructors.
    */
-  MoveitTrajectoryProcessor(const KinodynamicConstraints& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model):
+  MoveitTrajectoryProcessor(const KinodynamicConstraintsPtr& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model):
     SplineTrajectoryProcessor(constraints,param_ns,logger),group_name_(group_name),robot_model_(robot_model){}
-  MoveitTrajectoryProcessor(const KinodynamicConstraints& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::vector<Eigen::VectorXd>& path, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model):
+  MoveitTrajectoryProcessor(const KinodynamicConstraintsPtr& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::vector<Eigen::VectorXd>& path, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model):
     SplineTrajectoryProcessor(constraints,param_ns,logger,path),group_name_(group_name),robot_model_(robot_model){}
-  MoveitTrajectoryProcessor(const KinodynamicConstraints& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const spline_order_t& spline_order, const moveit_alg_t& moveit_alg, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model):
+  MoveitTrajectoryProcessor(const KinodynamicConstraintsPtr& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const spline_order_t& spline_order, const moveit_alg_t& moveit_alg, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model):
     SplineTrajectoryProcessor(constraints,param_ns,logger,spline_order),moveit_alg_(moveit_alg),group_name_(group_name),robot_model_(robot_model){}
-  MoveitTrajectoryProcessor(const KinodynamicConstraints& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::vector<Eigen::VectorXd>& path,const spline_order_t& spline_order,const moveit_alg_t& moveit_alg, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model):
+  MoveitTrajectoryProcessor(const KinodynamicConstraintsPtr& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::vector<Eigen::VectorXd>& path,const spline_order_t& spline_order,const moveit_alg_t& moveit_alg, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model):
     SplineTrajectoryProcessor(constraints,param_ns,logger,path,spline_order),moveit_alg_(moveit_alg),group_name_(group_name),robot_model_(robot_model){}
 
   /**
@@ -71,8 +73,8 @@ public:
    * @param robot_model A Moveit RobotModel pointer to the robot model.
    * @return true if successfull
    */
-  virtual bool init(const KinodynamicConstraints& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model);
-  virtual bool init(const KinodynamicConstraints& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::vector<Eigen::VectorXd>& path, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model);
+  virtual bool init(const KinodynamicConstraintsPtr& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model);
+  virtual bool init(const KinodynamicConstraintsPtr& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::vector<Eigen::VectorXd>& path, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model);
 
   /**
    * @brief Sets the moveit algorithm and clears the trajectory.
@@ -91,7 +93,7 @@ public:
    * @return True if the trajectory computation is successful, false otherwise.
    */
   virtual bool computeTrj() override;
-  virtual bool computeTrj(const RobotState& initial_state) override;
-  virtual bool computeTrj(const RobotState& initial_state, const RobotState& final_state) override;
+  virtual bool computeTrj(const RobotStatePtr& initial_state) override;
+  virtual bool computeTrj(const RobotStatePtr& initial_state, const RobotStatePtr& final_state) override;
 };
 }
