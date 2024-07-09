@@ -70,10 +70,11 @@ bool MoveitTrajectoryProcessor::computeTrj(const RobotStatePtr& initial_state, c
   if(not fromWaypoints2States(path_,robot_state,group_name_,states_vector))
     return false;
 
-  robot_trajectory::RobotTrajectoryPtr trj = std::make_shared<robot_trajectory::RobotTrajectory>(robot_model_);
+  robot_trajectory::RobotTrajectoryPtr trj = std::make_shared<robot_trajectory::RobotTrajectory>(robot_model_,group_name_);
 
   for(unsigned int j=0; j<path_.size();j++)
   {
+
     if(j==0 && (initial_state != nullptr))
     {
       states_vector.at(j)->setJointGroupPositions    (group_name_,initial_state->pos_);
@@ -116,7 +117,6 @@ bool MoveitTrajectoryProcessor::computeTrj(const RobotStatePtr& initial_state, c
 
     trj_.push_back(pt);
   }
-
   return true;
 }
 
