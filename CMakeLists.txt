@@ -18,7 +18,6 @@ endif()
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-find_package(cnr_param REQUIRED) #remove
 find_package(trajectories_processors_lib REQUIRED)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
@@ -44,7 +43,6 @@ include_directories(
  target_link_libraries(${PROJECT_NAME} PUBLIC
    ${catkin_LIBRARIES}
    trajectories_processors_lib::trajectories_processors_lib
-   cnr_param::cnr_param
  )
 
  # Install

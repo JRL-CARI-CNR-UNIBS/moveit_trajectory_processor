@@ -19,8 +19,6 @@
   <exec_depend>roscpp</exec_depend>
   <exec_depend>trajectories_processors_lib</exec_depend>
 
-  <depend>cnr_param</depend> <!--remove-->
-
   <export>
 
   </export>
