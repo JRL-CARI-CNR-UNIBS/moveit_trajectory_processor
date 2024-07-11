@@ -28,7 +28,7 @@ catkin_package(
   INCLUDE_DIRS include
   LIBRARIES ${PROJECT_NAME}
   CATKIN_DEPENDS roscpp moveit_ros_planning
-  DEPENDS trajectories_processors_lib cnr_param
+  DEPENDS trajectories_processors_lib
   )
 
 include_directories(
