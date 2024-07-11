@@ -46,7 +46,7 @@ include_directories(
  )
 
 # Install
-install(DIRECTORY include
+install(DIRECTORY include/
   DESTINATION ${CATKIN_GLOBAL_INCLUDE_DESTINATION}/)
 
 install(
