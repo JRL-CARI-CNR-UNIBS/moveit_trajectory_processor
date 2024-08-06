@@ -1,5 +1,3 @@
-Here's a refined version of the README:
-
 # moveit_trajectory_processor
 
 The `moveit_trajectory_processor` package offers a class that extends [`trajectories_processors_lib`](https://github.com/JRL-CARI-CNR-UNIBS/trajectories_processors_lib.git) by integrating trajectory processing algorithms from MoveIt. For more information, refer to the [MoveIt Time Parameterization tutorial](https://moveit.github.io/moveit_tutorials/doc/time_parameterization/time_parameterization_tutorial.html).
