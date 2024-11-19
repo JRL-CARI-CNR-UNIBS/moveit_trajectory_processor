@@ -1,6 +1,6 @@
 #pragma once
 
-#include <trajectories_processors_lib/spline_trajectory_processor.h>
+#include <openmore/trajectories_processors/spline_trajectory_processor.h>
 
 #include <moveit/trajectory_processing/iterative_time_parameterization.h>
 #include <moveit/trajectory_processing/iterative_spline_parameterization.h>
