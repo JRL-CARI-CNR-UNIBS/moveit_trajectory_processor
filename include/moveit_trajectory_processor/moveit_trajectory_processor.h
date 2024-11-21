@@ -46,7 +46,7 @@ protected:
   /**
    * @brief robot_model_ pointer to the Moveit RobotModel.
    */
-  robot_model::RobotModelPtr robot_model_;
+  moveit::core::RobotModelPtr robot_model_;
 
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
@@ -58,7 +58,7 @@ public:
                             const std::string& param_ns,
                             const cnr_logger::TraceLoggerPtr& logger,
                             const std::string& group_name,
-                            const robot_model::RobotModelPtr& robot_model):
+                            const moveit::core::RobotModelPtr& robot_model):
     SplineTrajectoryProcessor(constraints,param_ns,logger),group_name_(group_name),robot_model_(robot_model){}
 
   MoveitTrajectoryProcessor(const KinodynamicConstraintsPtr& constraints,
@@ -66,7 +66,7 @@ public:
                             const cnr_logger::TraceLoggerPtr& logger,
                             const std::vector<Eigen::VectorXd>& path,
                             const std::string& group_name,
-                            const robot_model::RobotModelPtr& robot_model):
+                            const moveit::core::RobotModelPtr& robot_model):
     SplineTrajectoryProcessor(constraints,param_ns,logger,path),group_name_(group_name),robot_model_(robot_model){}
 
   MoveitTrajectoryProcessor(const KinodynamicConstraintsPtr& constraints,
@@ -75,7 +75,7 @@ public:
                             const spline_order_t& spline_order,
                             const moveit_alg_t& moveit_alg,
                             const std::string& group_name,
-                            const robot_model::RobotModelPtr& robot_model):
+                            const moveit::core::RobotModelPtr& robot_model):
     SplineTrajectoryProcessor(constraints,param_ns,logger,spline_order),moveit_alg_(moveit_alg),group_name_(group_name),robot_model_(robot_model){}
 
   MoveitTrajectoryProcessor(const KinodynamicConstraintsPtr& constraints,
@@ -85,7 +85,7 @@ public:
                             const spline_order_t& spline_order,
                             const moveit_alg_t& moveit_alg,
                             const std::string& group_name,
-                            const robot_model::RobotModelPtr& robot_model):
+                            const moveit::core::RobotModelPtr& robot_model):
     SplineTrajectoryProcessor(constraints,param_ns,logger,path,spline_order),moveit_alg_(moveit_alg),group_name_(group_name),robot_model_(robot_model){}
 
   /**
@@ -98,8 +98,8 @@ public:
    * @param robot_model A Moveit RobotModel pointer to the robot model.
    * @return true if successfull
    */
-  virtual bool init(const KinodynamicConstraintsPtr& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::string& group_name, const robot_model::RobotModelPtr& robot_model);
-  virtual bool init(const KinodynamicConstraintsPtr& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::vector<Eigen::VectorXd>& path, const std::string& group_name, const robot_model::RobotModelPtr& robot_model);
+  virtual bool init(const KinodynamicConstraintsPtr& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model);
+  virtual bool init(const KinodynamicConstraintsPtr& constraints, const std::string& param_ns, const cnr_logger::TraceLoggerPtr& logger, const std::vector<Eigen::VectorXd>& path, const std::string& group_name, const moveit::core::RobotModelPtr& robot_model);
 
   /**
    * @brief Sets the moveit algorithm and clears the trajectory.
