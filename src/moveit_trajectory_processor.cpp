@@ -1,6 +1,6 @@
 #include <moveit_trajectory_processor/moveit_trajectory_processor.h>
 
-namespace trajectories_processors
+namespace openmore
 {
 
 void fromEigen2Vector(const Eigen::VectorXd& eigen, std::vector<double> vector)
