@@ -7,7 +7,7 @@
 #include <moveit/trajectory_processing/time_optimal_trajectory_generation.h>
 #include <moveit_msgs/msg/robot_trajectory.hpp>
 
-namespace trajectories_processors
+namespace openmore
 {
 
 void fromEigen2Vector(const Eigen::VectorXd& eigen, std::vector<double>& vector)

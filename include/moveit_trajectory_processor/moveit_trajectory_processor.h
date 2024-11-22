@@ -12,7 +12,7 @@
  * Note that this class does not consider the KinoDynamicConstraints given as input but uses the ones provided by Moveit.
  */
 
-namespace trajectories_processors
+namespace openmore
 {
 class MoveitTrajectoryProcessor;
 typedef std::shared_ptr<MoveitTrajectoryProcessor> MoveitTrajectoryProcessorPtr;

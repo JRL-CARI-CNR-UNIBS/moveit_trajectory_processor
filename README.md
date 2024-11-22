@@ -4,7 +4,7 @@ The `moveit_trajectory_processor` package offers a class that extends [`trajecto
 
 ### Overview
 
-The core of this package is the `MoveitTrajectoryProcessor` class, defined in the `moveit_trajectory_processor.h` file. This class inherits from the [`SplineTrajectoryProcessor`](https://github.com/JRL-CARI-CNR-UNIBS/trajectories_processors_lib/blob/master/include/trajectories_processors_lib/spline_trajectory_processor.h) class and implements the `computeTrj()` function using one of three available MoveIt algorithms:
+The core of this package is the `MoveitTrajectoryProcessor` class, defined in the `moveit_trajectory_processor.h` file. This class inherits from the [`SplineTrajectoryProcessor`](https://github.com/JRL-CARI-CNR-UNIBS/trajectories_processors_lib/blob/master/include/openmore/trajectories_processors/spline_trajectory_processor.h) class and implements the `computeTrj()` function using one of three available MoveIt algorithms:
 
 - **Iterative Time Parametrization (ITP)**
 - **Iterative Spline Parametrization (ISP)**
@@ -27,7 +27,7 @@ Below is a basic example demonstrating how to use the `MoveitTrajectoryProcessor
 
    // Initialization
 
-   using namespace trajectories_processors;
+   using namespace openmore;
    std::string group_name = "your_group_name"; // MoveIt group name
    std::string param_ns = "your_param_ns"; // Namespace for retrieving parameters via the cnr_param library
    std::string path_to_logger_conf_file = "some_path"; // Path to the cnr_logger configuration file
@@ -39,10 +39,14 @@ Below is a basic example demonstrating how to use the `MoveitTrajectoryProcessor
    robot_model::RobotModelPtr robot_model = robot_model_loader.getModel();
 
    KinodynamicConstraintsPtr constraints = std::make_shared<KinodynamicConstraints>();
+   constraints->max_pos_ = max_pos; // max_pos is an Eigen::VectorXd
+   constraints->min_pos_ = min_pos; // min_pos is an Eigen::VectorXd
    constraints->max_vel_ = max_vel; // max_vel is an Eigen::VectorXd
    constraints->min_vel_ = min_vel; // min_vel is an Eigen::VectorXd
    constraints->max_acc_ = max_acc; // max_acc is an Eigen::VectorXd
    constraints->min_acc_ = min_acc; // min_acc is an Eigen::VectorXd
+   constraints->max_eff_ = max_eff; // max_eff is an Eigen::VectorXd
+   constraints->min_eff_ = min_eff; // min_eff is an Eigen::VectorXd
 
    // Define the spline order
    auto spline_order = MoveitTrajectoryProcessor::spline_order_t::THREE;
