@@ -4,7 +4,7 @@ The `moveit_trajectory_processor` package offers a class that extends [`trajecto
 
 ### Overview
 
-The core of this package is the `MoveitTrajectoryProcessor` class, defined in the `moveit_trajectory_processor.h` file. This class inherits from the [`SplineTrajectoryProcessor`](https://github.com/JRL-CARI-CNR-UNIBS/trajectories_processors_lib/blob/master/include/trajectories_processors_lib/spline_trajectory_processor.h) class and implements the `computeTrj()` function using one of three available MoveIt algorithms:
+The core of this package is the `MoveitTrajectoryProcessor` class, defined in the `moveit_trajectory_processor.h` file. This class inherits from the [`SplineTrajectoryProcessor`](https://github.com/JRL-CARI-CNR-UNIBS/trajectories_processors_lib/blob/master/include/openmore/trajectories_processors/spline_trajectory_processor.h) class and implements the `computeTrj()` function using one of three available MoveIt algorithms:
 
 - **Iterative Time Parametrization (ITP)**
 - **Iterative Spline Parametrization (ISP)**
