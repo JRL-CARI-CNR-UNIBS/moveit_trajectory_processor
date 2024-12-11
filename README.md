@@ -23,6 +23,7 @@ Below is a basic example demonstrating how to use the `MoveitTrajectoryProcessor
 
 2. **Create and configure the trajectory processor:**
    ```cpp
+   #include <moveit/robot_model_loader/robot_model_loader.h>
    #include <moveit/move_group_interface/move_group_interface.h>
 
    // Initialization
@@ -34,28 +35,57 @@ Below is a basic example demonstrating how to use the `MoveitTrajectoryProcessor
 
    cnr_logger::TraceLoggerPtr logger = std::make_shared<cnr_logger::TraceLogger>("logger_example", path_to_logger_conf_file);
 
+   // MoveIt section
+
    moveit::planning_interface::MoveGroupInterface move_group(group_name);
    robot_model_loader::RobotModelLoader robot_model_loader("robot_description");
    robot_model::RobotModelPtr robot_model = robot_model_loader.getModel();
+   const robot_state::JointModelGroup* joint_model_group = move_group.getCurrentState()->getJointModelGroup(group_name);
+   std::vector<std::string> joint_names = joint_model_group->getActiveJointModelNames();
+   unsigned int dof = joint_names.size();
 
+   // Initialize all members of constraints to appropriate default values
+   
    KinodynamicConstraintsPtr constraints = std::make_shared<KinodynamicConstraints>();
-   constraints->max_pos_ = max_pos; // max_pos is an Eigen::VectorXd
-   constraints->min_pos_ = min_pos; // min_pos is an Eigen::VectorXd
-   constraints->max_vel_ = max_vel; // max_vel is an Eigen::VectorXd
-   constraints->min_vel_ = min_vel; // min_vel is an Eigen::VectorXd
-   constraints->max_acc_ = max_acc; // max_acc is an Eigen::VectorXd
-   constraints->min_acc_ = min_acc; // min_acc is an Eigen::VectorXd
-   constraints->max_eff_ = max_eff; // max_eff is an Eigen::VectorXd
-   constraints->min_eff_ = min_eff; // min_eff is an Eigen::VectorXdx
 
-   // Define the spline order
-   auto spline_order = MoveitTrajectoryProcessor::spline_order_t::THREE;
+   constraints->min_pos_ = Eigen::VectorXd::Constant(dof, -std::numeric_limits<double>::infinity());
+   constraints->max_pos_ = Eigen::VectorXd::Constant(dof,  std::numeric_limits<double>::infinity());
+   constraints->min_vel_ = Eigen::VectorXd::Constant(dof, -std::numeric_limits<double>::infinity());
+   constraints->max_vel_ = Eigen::VectorXd::Constant(dof,  std::numeric_limits<double>::infinity());
+   constraints->min_acc_ = Eigen::VectorXd::Constant(dof, -std::numeric_limits<double>::infinity());
+   constraints->max_acc_ = Eigen::VectorXd::Constant(dof,  std::numeric_limits<double>::infinity());
+   constraints->min_eff_ = Eigen::VectorXd::Constant(dof, -std::numeric_limits<double>::infinity());
+   constraints->max_eff_ = Eigen::VectorXd::Constant(dof,  std::numeric_limits<double>::infinity());
 
-   // Select the algorithm for timing-law computation
-   auto moveit_alg = MoveitTrajectoryProcessor::moveit_alg_t::ISP;
+   for (unsigned int idx = 0; idx < dof; idx++)
+   {
+     const robot_model::VariableBounds& bounds = robot_model->getVariableBounds(joint_names.at(idx));
 
-   MoveitTrajectoryProcessorPtr trajectory_processor = std::make_shared<MoveitTrajectoryProcessor>(
-         constraints, param_ns, logger, spline_order, moveit_alg, group_name, robot_model);
+     if (bounds.position_bounded_)
+     {
+       constraints->min_pos_(idx) = bounds.min_position_;
+       constraints->max_pos_(idx) = bounds.max_position_;
+     }
+     if (bounds.velocity_bounded_)
+     {
+       constraints->min_vel_(idx) = bounds.min_velocity_;
+       constraints->max_vel_(idx) = bounds.max_velocity_;
+     }
+     if (bounds.acceleration_bounded_)
+     {
+       constraints->min_acc_(idx) = bounds.min_acceleration_;
+       constraints->max_acc_(idx) = bounds.max_acceleration_;
+     }
+   }
+
+    // Define the spline order
+    auto spline_order = MoveitTrajectoryProcessor::spline_order_t::THREE;
+
+    // Select the algorithm for timing-law computation
+    auto moveit_alg = MoveitTrajectoryProcessor::moveit_alg_t::ISP;
+
+    MoveitTrajectoryProcessorPtr trajectory_processor = std::make_shared<MoveitTrajectoryProcessor>(
+          constraints, param_ns, logger, spline_order, moveit_alg, group_name, robot_model);
    ```
 
 This example sets up a trajectory processor that uses the Iterative Spline Parametrization (ISP) algorithm from MoveIt. You can easily modify this template to use different algorithms or customize it further according to your application needs.
