@@ -39,26 +39,62 @@ add_library(${PROJECT_NAME} SHARED
   src/moveit_trajectory_processor.cpp
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC ${DEPS_TARGET})
- target_include_directories(${PROJECT_NAME} PUBLIC
-   $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
-   $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
- ament_target_dependencies(${PROJECT_NAME} PUBLIC ${ROS_DEPS})
- 
- ament_export_targets(export_${PROJECT_NAME} HAS_LIBRARY_TARGET)
- ament_export_dependencies(${DEPS_LIB} ${ROS_DEPS})
+target_include_directories(${PROJECT_NAME} PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:include/${PROJECT_NAME}>)
+ament_target_dependencies(${PROJECT_NAME} PUBLIC ${ROS_DEPS})
+
+ament_export_targets(${PROJECT_NAME}Targets HAS_LIBRARY_TARGET)
+ament_export_dependencies(${DEPS_LIB} ${ROS_DEPS})
 
 # Install
+install(DIRECTORY include/${PROJECT_NAME}
+    DESTINATION include)
+
 install(
-  TARGETS ${PROJECT_NAME}
-  EXPORT export_${PROJECT_NAME}
-  ARCHIVE DESTINATION lib
-  LIBRARY DESTINATION lib
-  RUNTIME DESTINATION bin
+    TARGETS ${PROJECT_NAME}
+    EXPORT ${PROJECT_NAME}Targets
+    ARCHIVE DESTINATION lib
+    LIBRARY DESTINATION lib
+    RUNTIME DESTINATION bin
+    INCLUDES DESTINATION include
 )
 
-install(DIRECTORY include/
-  DESTINATION include/
+install(EXPORT ${PROJECT_NAME}Targets
+    DESTINATION "share/${PROJECT_NAME}/cmake"
+    NAMESPACE ${PROJECT_NAME}::
+    FILE ${PROJECT_NAME}Targets.cmake
 )
+
+include(CMakePackageConfigHelpers)
+include(GNUInstallDirs)
+
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    VERSION 0.0.1
+    COMPATIBILITY AnyNewerVersion)
+configure_package_config_file(
+    ${CMAKE_SOURCE_DIR}/cmake_config/${PROJECT_NAME}Config.cmake.in ${PROJECT_NAME}Config.cmake
+    INSTALL_DESTINATION share/${PROJECT_NAME}/cmake
+    PATH_VARS CMAKE_INSTALL_INCLUDEDIR CMAKE_INSTALL_LIBDIR
+)
+
+install(FILES
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}Config.cmake
+    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}ConfigVersion.cmake
+    DESTINATION "share/${PROJECT_NAME}/cmake")
+
+# make uninstall
+if(ADD_CUSTOM_UNINSTALL)
+    message(STATUS "Adding custom uninstall")
+    add_custom_target("uninstall" COMMENT "Uninstall installed files")
+    add_custom_command(
+        TARGET "uninstall"
+        POST_BUILD
+        COMMENT "Uninstall files with install_manifest.txt"
+        COMMAND xargs rm -vf < install_manifest.txt || echo Nothing in
+        install_manifest.txt to be uninstalled!
+    )
+endif()
 
 # if(BUILD_TESTING)
 #  find_package(ament_lint_auto REQUIRED)
