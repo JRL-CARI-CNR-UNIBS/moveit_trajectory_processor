@@ -73,18 +73,6 @@ bool fromWaypoints2States(const std::vector<Eigen::VectorXd>& waypoints,
   return true;
 }
 
-bool MoveitTrajectoryProcessor::computeTrj()
-{
-  RobotStatePtr initial_state;
-  return computeTrj(initial_state);
-}
-
-bool MoveitTrajectoryProcessor::computeTrj(const RobotStatePtr& initial_state)
-{
-  RobotStatePtr final_state;
-  return computeTrj(initial_state,final_state);
-}
-
 bool MoveitTrajectoryProcessor::computeTrj(const RobotStatePtr& initial_state, const RobotStatePtr& final_state)
 {
   if(path_.empty())

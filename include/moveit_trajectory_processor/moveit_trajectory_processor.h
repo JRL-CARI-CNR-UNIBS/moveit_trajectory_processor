@@ -152,8 +152,7 @@ public:
    * @param final_state The final robot state.
    * @return True if the trajectory computation is successful, false otherwise.
    */
-  virtual bool computeTrj() override;
-  virtual bool computeTrj(const RobotStatePtr& initial_state) override;
   virtual bool computeTrj(const RobotStatePtr& initial_state, const RobotStatePtr& final_state) override;
+  using TrajectoryProcessorBase::computeTrj; //bring other versions of computeTrj
 };
 }
