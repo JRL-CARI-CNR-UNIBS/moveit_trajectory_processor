@@ -55,7 +55,7 @@ typedef std::shared_ptr<MoveitTrajectoryProcessor> MoveitTrajectoryProcessorPtr;
 /**
  * @brief Processes trajectories using Moveit algorithms and provides spline-based interpolation.
  */
-class MoveitTrajectoryProcessor: public SplineTrajectoryProcessor
+class MoveitTrajectoryProcessor: public virtual SplineTrajectoryProcessor
 {
 public:
 
