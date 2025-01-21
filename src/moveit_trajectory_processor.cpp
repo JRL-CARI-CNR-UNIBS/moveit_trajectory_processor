@@ -132,11 +132,11 @@ bool MoveitTrajectoryProcessor::computeTrj(const RobotStatePtr& initial_state, c
   {
     TrjPointPtr pt = std::make_shared<TrjPoint>();
 
-    pt->state_->pos_ = std::move(trj_point.positions);
-    pt->state_->vel_ = std::move(trj_point.velocities);
-    pt->state_->acc_ = std::move(trj_point.accelerations);
-    pt->state_->eff_ = std::move(trj_point.effort);
-    pt->time_from_start_ = std::move(trj_point.time_from_start.toSec());
+    pt->state_->pos_ = trj_point.positions;
+    pt->state_->vel_ = trj_point.velocities;
+    pt->state_->acc_ = trj_point.accelerations;
+    pt->state_->eff_ = trj_point.effort;
+    pt->time_from_start_ = trj_point.time_from_start.toSec();
 
     trj_.push_back(pt);
   }
